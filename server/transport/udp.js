@@ -27,7 +27,7 @@ module.exports = options => {
   server.on('message', msg => {
     count++;
 
-    dataView({ port, workerId: id, count, memory });
+    // dataView({ port, workerId: id, count, memory });
   });
 
   server.on('error', err => {
