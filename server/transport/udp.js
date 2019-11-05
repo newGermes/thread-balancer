@@ -8,26 +8,9 @@ module.exports = options => {
   const { port, hostname, id } = options;
   let count = 0;
 
-  const debounce = (f, ms) => {
-    let timeout = null;
-    return (...args) => {
-      const later = () => {
-        timeout = null;
-        f(args);
-      };
-
-      clearTimeout(timeout);
-      timeout = setTimeout(later, ms);
-      if (!timeout) f(args);
-    };
-  };
-
-  const dataView = debounce(console.log, 500);
-
-  server.on('message', info => {
+  server.on('message', (msg, info) => {
     count++;
 
-    // dataView({ port, workerId: id, count, memory });
     //sending msg
     server.send(
       JSON.stringify({ port, workerId: id, count, memory }),

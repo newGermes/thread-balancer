@@ -16,27 +16,13 @@ module.exports = options => {
 
     let diff = 0n;
 
-    socket.send(Buffer.from('Run!'), port, hostname, error => {
-      if (error) {
-        console.log(error);
-        socket.close();
-      } else {
-        console.log('Data sent !!!');
-      }
-    });
+    socket.send('Run!', port, hostname);
 
     socket.on('message', (msg, info) => {
       const end = process.hrtime.bigint();
 
       if (diff < TIME) {
-        socket.send(Buffer.from('Run!'), info.port, info.address, error => {
-          if (error) {
-            console.log(error);
-            socket.close();
-          } else {
-            console.log('Data sent !!!');
-          }
-        });
+        socket.send('Run!', info.port, info.address);
 
         // logging after 50s
         if (diff < logMaxTime && diff > logMinTime) {
