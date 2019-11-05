@@ -24,10 +24,16 @@ module.exports = options => {
 
   const dataView = debounce(console.log, 500);
 
-  server.on('message', msg => {
+  server.on('message', info => {
     count++;
 
     // dataView({ port, workerId: id, count, memory });
+    //sending msg
+    server.send(
+      JSON.stringify({ port, workerId: id, count, memory }),
+      info.port,
+      info.address
+    );
   });
 
   server.on('error', err => {
