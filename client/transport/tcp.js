@@ -8,13 +8,14 @@ module.exports = options => {
   const requesterAsync = port => {
     const socket = new net.Socket();
 
-    const TIME = 60000000001n;
+    const TIME = 63000000001n;
     const start = process.hrtime.bigint();
     const file = `${logFile}_${port}.log`;
     const logMinTime = 50000000000n;
     const logMaxTime = 50000999999n;
 
     let diff = 0n;
+    let cache = '';
 
     socket.connect({ port, host: hostname }, () => {
       socket.write('Run!');
@@ -28,12 +29,14 @@ module.exports = options => {
 
         // logging after 50s
         if (diff < logMaxTime && diff > logMinTime) {
-          logger(file, data);
+          // logger(file, data);
+          cache += data;
         }
       } else {
         // logging after 60s
-        data += '>----separator----<';
-        logger(file, data);
+        cache += data + '>----separator----<';
+        logger(file, cache);
+        console.log('stop');
       }
 
       diff = end - start;
@@ -44,13 +47,14 @@ module.exports = options => {
     });
   };
 
-  function logger(file, data) {
-    const ws = fs.createWriteStream(file, { flags: 'a' }, 'utf-8');
-    ws.write(data);
-    ws.on('finish', () => {
-      console.log('Wrote log to file!');
+  async function logger(file, data) {
+    return new Promise((res, rej) => {
+      const ws = fs.createWriteStream(file, { flags: 'a' }, 'utf-8');
+      ws.write(data);
+      ws.on('finish', () => res('Wrote log to file!'));
+      ws.on('error', e => rej(e));
+      ws.end();
     });
-    ws.end();
   }
 
   ports.forEach(port => requesterAsync(port));

@@ -33,14 +33,15 @@ module.exports = options => {
     });
 
   async function requesterAsync(port) {
-    const TIME = 60000000001n;
+    const TIME = 63000000001n;
     const start = process.hrtime.bigint();
     const file = `${logFile}_${port}.log`;
     const logMinTime = 50000000000n;
     const logMaxTime = 50000999999n;
 
     let diff = 0n;
-    let data = null;
+    let data = '';
+    let cache = '';
 
     while (diff < TIME) {
       const end = process.hrtime.bigint();
@@ -54,12 +55,13 @@ module.exports = options => {
 
       // logging after 50s
       if (diff < logMaxTime && diff > logMinTime) {
-        logger(file, data);
+        //logger(file, data);
+        cache += data;
       }
     }
     // logging after 60s
-    data += '>----separator----<';
-    logger(file, data);
+    cache += data + '>----separator----<';
+    logger(file, cache);
   }
 
   async function logger(file, data) {
