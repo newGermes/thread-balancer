@@ -5,7 +5,7 @@ module.exports = options => {
   const server = dgram.createSocket('udp4');
   const memory = process.memoryUsage();
 
-  const { port, hostname, id } = options;
+  const { port, hostname, id, parentPort, isDisconnect, delay } = options;
   let count = 0;
 
   server.on('message', (msg, info) => {
@@ -23,6 +23,19 @@ module.exports = options => {
     console.log(`server error:\n${err.stack}`);
     server.close();
   });
+
+  // disconnect
+  if (JSON.parse(isDisconnect)) {
+    setTimeout(() => {
+      if (parentPort) {
+        parentPort.postMessage({ port });
+      } else {
+        process.send({ port });
+      }
+      server.destroy();
+      process.exit(1);
+    }, delay);
+  }
 
   server.bind(port, hostname, () => {
     console.log(`Server has started: ${hostname}:${port}`);
